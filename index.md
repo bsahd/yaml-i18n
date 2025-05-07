@@ -1,4 +1,5 @@
 # YAML-based Document
+## Example
 ```yaml
 - ja: "ドキュメントの国際化のための方法論"
   en: "Methodology for document internationalization."
