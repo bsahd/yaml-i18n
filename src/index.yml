@@ -1,0 +1,21 @@
+title:
+  ja: "YAMLベースの国際化ドキュメントフォーマット"
+  en: "YAML-based internationalized document format"
+languages:
+  - ja
+  - en
+mainlanguage: ja
+lines:
+  - ja: "# YAMLベース ドキュメント"
+    en: "# YAML-based Document"
+  - ja: "**YAML内の国際化されたマークダウン**"
+    en: "**i18ned Markdown in YAML**"
+  - ja: "## サンプル"
+    en: "## Example"
+  - |-
+    ```yaml
+    - ja: "ドキュメントの国際化のための方法論"
+      en: "Methodology for document internationalization."
+    - "" # blank line its separetes paragraph in markdown
+    ```
+  - ja: "日本語オンリー"
