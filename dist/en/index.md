@@ -1,4 +1,6 @@
-# YAML-based Document
+[ja:100%](/dist/ja/index.md) [en:80%](/dist/en/index.md)
+
+# YAML-based internationalized document format
 **internationalized Markdown in YAML**
 ## Example
 ```yaml
@@ -6,4 +8,4 @@
   en: "Methodology for document internationalization."
 - "" # blank line its separetes paragraph in markdown
 ```
-[UNTRANSLATED]日本語オンリー
+[UNTRANSLATED] 日本語オンリー行
