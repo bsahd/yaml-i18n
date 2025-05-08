@@ -1,10 +1,6 @@
 title:
   ja: "YAMLベースの国際化ドキュメントフォーマット"
   en: "YAML-based internationalized document format"
-languages:
-  - ja
-  - en
-mainlanguage: ja
 lines:
   - ja: "# YAMLベース ドキュメント"
     en: "# YAML-based Document"
