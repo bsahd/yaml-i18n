@@ -4,25 +4,30 @@ import { load } from "js-yaml";
 
 const config = load(fs.readFileSync("./doc.config.yml", "utf8"));
 
-function calcCoverage(docLines, languages, mainLang) {
+function calcCoverage(docLines, languages) {
 	const coverage = {};
 	for (const lang of languages) {
 		let covered = 0;
 		for (const line of docLines) {
-			if (typeof line === "string" || line[lang]) covered += 1;
+			if (typeof line === "string" || line[lang]) {
+				covered += 1;
+			}
 		}
 		coverage[lang] = covered / docLines.length;
 	}
 	return coverage;
 }
 
-function renderHeaderLinks(coverage, filename, mainLang) {
+function renderHeaderLinks(coverage, filename, displayingLang) {
 	return (
 		Object.entries(coverage)
 			.map(([lang, ratio]) => {
 				const percent = (ratio * 100).toFixed();
+				if (displayingLang == lang) {
+					return `**${lang}:${percent}%**`;
+				}
 				const href = path.relative(
-					filename,
+					`./dist/${displayingLang}/${path.dirname(filename.slice(4))}`,
 					`./dist/${lang}/${filename.slice(4).replace(/\.ya?ml$/, ".md")}`
 				);
 				return `[${lang}:${percent}%](${href})`;
@@ -41,23 +46,62 @@ function renderDocument(docLines, lang, mainLang) {
 		.join("\n");
 }
 
-function writeLangFile(language, filename, content) {
+async function writeLangFile(language, filename, content) {
 	const outputPath = `dist/${language}/${filename
 		.slice(4)
 		.replace(/\.ya?ml$/, ".md")}`;
-	fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-	fs.writeFileSync(outputPath, content, "utf8");
+	await fs.promises.mkdir(path.dirname(outputPath), { recursive: true });
+	await fs.promises.writeFile(outputPath, content, "utf8");
+}
+
+let runningCount = 0;
+
+function delay(ms) {
+	return new Promise((a) => setTimeout(a, ms));
 }
 
 // メイン処理
-for (const filename of fs.globSync("src/**/*.yml")) {
-	console.log(filename);
-	const lines = load(fs.readFileSync(filename, "utf8"));
-	const coverage = calcCoverage(lines, config.languages, config.mainlanguage);
+const filenames = await Array.fromAsync(fs.promises.glob("src/**/*.yml"));
 
-	for (const lang of config.languages) {
-		const header = renderHeaderLinks(coverage, filename, config.mainlanguage);
-		const body = renderDocument(lines, lang, config.mainlanguage);
-		writeLangFile(lang, filename, header + "\n" + body);
-	}
+function updateDisp() {
+	process.stdout.write(
+		`\r${"#".repeat((doneCount / filenames.length) * 60)}${"_".repeat(
+			(1 - doneCount / filenames.length) * 60
+		)} ${doneCount}(${runningCount})/${filenames.length}`
+	);
 }
+let doneCount = 0;
+updateDisp();
+for (const filename of filenames) {
+	while (runningCount > 7) {
+		await delay(10);
+		updateDisp();
+	}
+	updateDisp();
+	(async () => {
+		runningCount++;
+		try {
+			const lines = load(await fs.promises.readFile(filename, "utf8"));
+			const coverage = calcCoverage(lines, config.languages);
+
+			for (const lang of config.languages) {
+				const header = renderHeaderLinks(coverage, filename, lang);
+				const body = renderDocument(lines, lang, config.mainlanguage);
+				writeLangFile(lang, filename, header + "\n" + body);
+			}
+			await delay(50);
+		} catch (e) {
+			console.log(e);
+		} finally {
+			runningCount--;
+			doneCount++;
+		}
+	})();
+}
+
+while (runningCount > 0 && doneCount != filenames.length) {
+	await delay(10);
+	updateDisp();
+}
+updateDisp();
+console.log("\ndone");

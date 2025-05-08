@@ -1,4 +1,4 @@
-[ja:100%](../../dist/ja/index.md) [en:80%](../../dist/en/index.md)
+[ja:100%](../ja/index.md) **en:80%**
 
 # YAML-based internationalized document format
 **internationalized Markdown in YAML**
