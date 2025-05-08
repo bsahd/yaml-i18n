@@ -28,7 +28,7 @@ function renderHeaderLinks(coverage, filename, displayingLang) {
 				}
 				const href = path.relative(
 					`./dist/${displayingLang}/${path.dirname(filename.slice(4))}`,
-					`./dist/${lang}/${filename.slice(4).replace(/\.ya?ml$/, ".md")}`
+					`./dist/${lang}/${filename.slice(4).replace(/\.ya?ml$/, ".md")}`,
 				);
 				return `[${lang}:${percent}%](${href})`;
 			})
@@ -41,7 +41,7 @@ function renderDocument(docLines, lang, mainLang) {
 		.map((line) =>
 			typeof line === "string"
 				? line
-				: line[lang] ?? `[UNTRANSLATED] ${line[mainLang]}`
+				: (line[lang] ?? `[UNTRANSLATED] ${line[mainLang]}`),
 		)
 		.join("\n");
 }
@@ -66,8 +66,8 @@ const filenames = await Array.fromAsync(fs.promises.glob("src/**/*.yml"));
 function updateDisp() {
 	process.stdout.write(
 		`\r${"#".repeat((doneCount / filenames.length) * 60)}${"_".repeat(
-			(1 - doneCount / filenames.length) * 60
-		)} ${doneCount}(${runningCount})/${filenames.length}`
+			(1 - doneCount / filenames.length) * 60,
+		)} ${doneCount}(${runningCount})/${filenames.length}`,
 	);
 }
 let doneCount = 0;
@@ -89,7 +89,6 @@ for (const filename of filenames) {
 				const body = renderDocument(lines, lang, config.mainlanguage);
 				writeLangFile(lang, filename, header + "\n" + body);
 			}
-			await delay(50);
 		} catch (e) {
 			console.log(e);
 		} finally {
