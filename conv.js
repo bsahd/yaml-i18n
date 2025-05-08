@@ -28,7 +28,7 @@ function renderHeaderLinks(coverage, filename, displayingLang) {
 				}
 				const href = path.relative(
 					`./dist/${displayingLang}/${path.dirname(filename.slice(4))}`,
-					`./dist/${lang}/${filename.slice(4).replace(/\.ya?ml$/, ".md")}`,
+					`./dist/${lang}/${filename.slice(4).replace(/\.ya?ml$/, ".md")}`
 				);
 				return `[${lang}:${percent}%](${href})`;
 			})
@@ -41,7 +41,7 @@ function renderDocument(docLines, lang, mainLang) {
 		.map((line) =>
 			typeof line === "string"
 				? line
-				: (line[lang] ?? `[UNTRANSLATED] ${line[mainLang]}`),
+				: line[lang] ?? `[UNTRANSLATED] ${line[mainLang]}`
 		)
 		.join("\n");
 }
@@ -54,7 +54,7 @@ async function writeLangFile(language, filename, content) {
 	await fs.promises.writeFile(outputPath, content, "utf8");
 }
 
-let runningCount = 0;
+let runnings = [];
 
 function delay(ms) {
 	return new Promise((a) => setTimeout(a, ms));
@@ -65,21 +65,26 @@ const filenames = await Array.fromAsync(fs.promises.glob("src/**/*.yml"));
 
 function updateDisp() {
 	process.stdout.write(
-		`\r${"#".repeat((doneCount / filenames.length) * 60)}${"_".repeat(
-			(1 - doneCount / filenames.length) * 60,
-		)} ${doneCount}(${runningCount})/${filenames.length}`,
+		`\x1b[1F\x1b[2K${runnings
+			.map((a) => a.slice(4))
+			.join(" ")
+			.slice(0, 70)}\n${"#".repeat(
+			(doneCount / filenames.length) * 60
+		)}${"_".repeat((1 - doneCount / filenames.length) * 60)} ${doneCount}(${
+			runnings.length
+		})/${filenames.length}`
 	);
 }
 let doneCount = 0;
 updateDisp();
 for (const filename of filenames) {
-	while (runningCount > 7) {
+	while (runnings.length > 7) {
 		await delay(10);
 		updateDisp();
 	}
 	updateDisp();
 	(async () => {
-		runningCount++;
+		runnings.push(filename);
 		try {
 			const lines = load(await fs.promises.readFile(filename, "utf8"));
 			const coverage = calcCoverage(lines, config.languages);
@@ -92,13 +97,13 @@ for (const filename of filenames) {
 		} catch (e) {
 			console.log(e);
 		} finally {
-			runningCount--;
+			runnings.splice(runnings.indexOf(filename), 1);
 			doneCount++;
 		}
 	})();
 }
 
-while (runningCount > 0 && doneCount != filenames.length) {
+while (runnings.length > 0 && doneCount != filenames.length) {
 	await delay(10);
 	updateDisp();
 }
