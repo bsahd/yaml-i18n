@@ -21,9 +21,10 @@ function renderHeaderLinks(coverage, filename, mainLang) {
 		Object.entries(coverage)
 			.map(([lang, ratio]) => {
 				const percent = (ratio * 100).toFixed();
-				const href = `/dist/${lang}/${filename
-					.slice(4)
-					.replace(/\.ya?ml$/, ".md")}`;
+				const href = path.relative(
+					filename,
+					`./dist/${lang}/${filename.slice(4).replace(/\.ya?ml$/, ".md")}`
+				);
 				return `[${lang}:${percent}%](${href})`;
 			})
 			.join(" ") + "\n"

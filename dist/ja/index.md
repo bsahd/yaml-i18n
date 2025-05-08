@@ -1,4 +1,4 @@
-[ja:100%](/dist/ja/index.md) [en:80%](/dist/en/index.md)
+[ja:100%](../../dist/ja/index.md) [en:80%](../../dist/en/index.md)
 
 # YAMLベースの国際化ドキュメントフォーマット
 **YAML内の国際化されたマークダウン**
