@@ -1,5 +1,5 @@
 # YAML-based Document
-**i18ned Markdown in YAML**
+**internationalized Markdown in YAML**
 ## Example
 ```yaml
 - ja: "ドキュメントの国際化のための方法論"

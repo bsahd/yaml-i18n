@@ -9,7 +9,7 @@ lines:
   - ja: "# YAMLベース ドキュメント"
     en: "# YAML-based Document"
   - ja: "**YAML内の国際化されたマークダウン**"
-    en: "**i18ned Markdown in YAML**"
+    en: "**internationalized Markdown in YAML**"
   - ja: "## サンプル"
     en: "## Example"
   - |-
